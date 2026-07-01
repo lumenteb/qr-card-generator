@@ -3,6 +3,15 @@
 
 Python automation tool for generating QR/product design cards from input data, QR codes, fonts, and visual assets.
 
+## Example Output
+
+Below is an example of a generated QR/product card:
+
+> Note: The QR code in the example image is generated for demo purposes only.  
+> It does not contain real client or company data.
+
+![Example output](examples/example_output.png)
+
 ## Overview
 
 This project automates a repetitive design workflow: creating many product/QR cards manually.  
@@ -55,3 +64,6 @@ qr-card-generator/
 ├── output/
 ├── fonts/
 └── examples/git init
+
+
+[def]: examples/example_output.png
