@@ -76,6 +76,3 @@ qr-card-generator/
 ├── output/
 ├── fonts/
 └── examples/
-
-
-[def]: examples/example_output.png
