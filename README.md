@@ -1,4 +1,4 @@
-@'
+
 # QR Card Generator
 
 Python automation tool for generating QR/product design cards from input data, QR codes, fonts, and visual assets.
