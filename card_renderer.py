@@ -17,6 +17,7 @@ from config import (
     CARD_HEIGHT,
     CARD_WIDTH,
     DPI,
+    FONT_CANDIDATES,
     FONT_SIZE,
     FONTS_DIR,
     INNER_LINE_GAP,
@@ -40,6 +41,7 @@ from config import (
     TILE_NAME_MAX_LINES,
     TILE_SIZE_MAX_LINES,
     DEBUG_LAYOUT,
+
 )
 from product_parser import CardTextFields
 
@@ -118,39 +120,47 @@ def font_priority(font_path: Path) -> tuple[int, str]:
     return priority, name
 
 
-def find_cormorant_font() -> Path:
+def find_card_font() -> Path:
     global _FONT_PATH_CACHE
 
     if _FONT_PATH_CACHE is not None:
         return _FONT_PATH_CACHE
 
-    if not FONTS_DIR.exists():
-        raise FileNotFoundError(
-            f"ERROR: Cormorant Garamond font not found.\nPut the font file into: {format_font_path(FONTS_DIR)}"
-        )
+    local_font_files: list[Path] = []
 
-    font_files = [
-        path
-        for path in FONTS_DIR.iterdir()
-        if path.is_file()
-        and path.suffix.lower() in {".ttf", ".otf"}
-        and any(keyword.lower() in path.stem.lower() for keyword in PREFERRED_FONT_KEYWORDS)
+    if FONTS_DIR.exists():
+        local_font_files = [
+            path
+            for path in FONTS_DIR.iterdir()
+            if path.is_file()
+            and path.suffix.lower() in {".ttf", ".otf"}
+            and any(
+                keyword.lower() in path.stem.lower()
+                for keyword in PREFERRED_FONT_KEYWORDS
+            )
+        ]
+
+    candidates = [
+        *sorted(local_font_files, key=font_priority),
+        *FONT_CANDIDATES,
     ]
 
-    if not font_files:
-        raise FileNotFoundError(
-            f"ERROR: Cormorant Garamond font not found in {format_font_path(FONTS_DIR)}\n"
-            "Put CormorantGaramond-Regular.ttf into fonts/"
-        )
+    for font_path in candidates:
+        if font_path.exists() and font_path.is_file():
+            _FONT_PATH_CACHE = font_path
+            return _FONT_PATH_CACHE
 
-    _FONT_PATH_CACHE = sorted(font_files, key=font_priority)[0]
-    return _FONT_PATH_CACHE
+    raise FileNotFoundError(
+        "No usable font found. "
+        "Add CormorantGaramond-Regular.ttf to fonts/ "
+        "or update FONT_CANDIDATES in config.py."
+    )
 
 
 def load_font(size: int):
     global _FONT_INFO_PRINTED
 
-    font_path = find_cormorant_font()
+    font_path = find_card_font()
     font = ImageFont.truetype(str(font_path), size=size)
 
     if not _FONT_INFO_PRINTED:
