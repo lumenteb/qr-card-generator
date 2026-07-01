@@ -84,7 +84,6 @@ FONT_CANDIDATES = (
     Path("C:/Windows/Fonts/georgia.ttf"),
     Path("C:/Windows/Fonts/arial.ttf"),
 )
-
 # Website request settings used by product parsing logic.
 # Delays and retries reduce the chance of failed requests or rate limiting.
 

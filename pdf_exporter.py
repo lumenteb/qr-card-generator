@@ -11,7 +11,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 
 from card_renderer import (
     build_card_text_layout,
-    find_cormorant_font,
+    find_card_font,
     layout_field_lines,
     layout_field_line_gap,
     layout_field_y,
@@ -46,7 +46,7 @@ def page_size_points() -> tuple[float, float]:
 
 
 def register_pdf_font() -> Path:
-    font_path = find_cormorant_font()
+    font_path = find_card_font()
     registered = set(pdfmetrics.getRegisteredFontNames())
     if PDF_FONT_NAME not in registered:
         pdfmetrics.registerFont(TTFont(PDF_FONT_NAME, str(font_path)))

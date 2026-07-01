@@ -5,6 +5,7 @@ import random
 import re
 import time
 from pathlib import Path
+from urllib.parse import unquote, urlparse
 
 import requests
 
@@ -79,6 +80,7 @@ def empty_log_row(filename: str) -> dict[str, str]:
         "status": "",
         "reason": "",
         "url": "",
+        "resolved_url": "",
         "brand": "",
         "country": "",
         "size": "",
@@ -135,11 +137,83 @@ def layout_to_log_fields(layout: TextLayout) -> dict[str, str]:
     }
 
 
+def title_from_url(url: str) -> str:
+    if not url:
+        return ""
+
+    path_parts = [
+        unquote(part)
+        for part in urlparse(url).path.split("/")
+        if part and not part.isdigit()
+    ]
+    if not path_parts:
+        return ""
+
+    title = path_parts[-1].replace("-", " ").replace("_", " ")
+    title = re.sub(
+        r"\b\d+(?:[.,\s]\d+)?\s*sq\s*ft\b.*$",
+        "",
+        title,
+        flags=re.IGNORECASE,
+    )
+    title = re.sub(r"\bfloor\s+and\s+wall\s+tile\b", "", title, flags=re.IGNORECASE)
+    return re.sub(r"\s+", " ", title).strip()
+
+
+def fallback_size_from_text(text: str) -> str | None:
+    size = normalize_size(text)
+    if size:
+        return size
+
+    imperial = re.search(
+        r"(?<!\d)(\d+(?:[.,]\d+)?)\s*in(?:ch(?:es)?)?\s*"
+        r"[xX\u00d7]\s*"
+        r"(\d+(?:[.,]\d+)?)\s*in(?:ch(?:es)?)?",
+        text,
+        flags=re.IGNORECASE,
+    )
+    if imperial:
+        return (
+            f"{imperial.group(1).replace('.', ',')} x "
+            f"{imperial.group(2).replace('.', ',')} in"
+        )
+    return None
+
+
 def product_from_filename(path: Path, url: str = "") -> ProductData:
-    title = re.sub(r"^QR[\s_-]*", "", path.stem, flags=re.IGNORECASE).strip()
-    size = normalize_size(title)
-    first_word = title.split(maxsplit=1)[0] if title else None
-    model_name = normalize_model_name(title, first_word, size)
+    filename_title = re.sub(
+        r"^QR[\s_-]*",
+        "",
+        path.stem,
+        flags=re.IGNORECASE,
+    ).strip()
+    generic_filename = bool(
+        re.fullmatch(r"(?:qr)?code[\s_-]*\d+", filename_title, re.IGNORECASE)
+    )
+    title = title_from_url(url) if generic_filename else filename_title
+    title = title or filename_title or path.stem
+    size = fallback_size_from_text(title)
+    product_type = None
+    first_word = title.split(maxsplit=1)[0] if title else ""
+    if first_word.casefold() in {
+        "plitka",
+        "\u043f\u043b\u0438\u0442\u043a\u0430",
+        "\u0434\u0435\u043a\u043e\u0440",
+        "tile",
+    }:
+        product_type = first_word
+
+    model_source = title
+    if size and size.endswith(" in"):
+        model_source = re.sub(
+            r"(?<!\d)\d+(?:[.,]\d+)?\s*in(?:ch(?:es)?)?\s*"
+            r"[xX\u00d7]\s*"
+            r"\d+(?:[.,]\d+)?\s*in(?:ch(?:es)?)?",
+            " ",
+            model_source,
+            flags=re.IGNORECASE,
+        )
+    model_name = normalize_model_name(model_source, product_type, size)
     sources = {
         "title": f"filename fallback -> {title}",
         "model_name": f"filename fallback -> {model_name or title}",
@@ -152,7 +226,7 @@ def product_from_filename(path: Path, url: str = "") -> ProductData:
     return ProductData(
         url=url,
         title=title or path.stem,
-        product_type=first_word,
+        product_type=product_type,
         size=size,
         model_name=model_name or title or path.stem,
         debug_sources=sources,
@@ -277,8 +351,16 @@ def main():
                         product = parse_product_with_retries(result.url)
                         product_cache[result.url] = product
                 except Exception as error:
-                    reasons.append(f"Parser error; filename fallback used: {error}")
-                    product = product_from_filename(result.path, result.url)
+                    response = getattr(error, "response", None)
+                    resolved_url = getattr(response, "url", "") or result.url
+                    row["resolved_url"] = resolved_url
+                    reasons.append(
+                        f"Parser error; URL/filename fallback used: {error}"
+                    )
+                    product = product_from_filename(
+                        result.path,
+                        resolved_url,
+                    )
             else:
                 qr_error = result.error or "QR code not detected"
                 reasons.append(f"QR decode error; filename fallback used: {qr_error}")

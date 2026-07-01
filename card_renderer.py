@@ -40,8 +40,6 @@ from config import (
     TILE_NAME_LINE_HEIGHT_MULTIPLIER,
     TILE_NAME_MAX_LINES,
     TILE_SIZE_MAX_LINES,
-    DEBUG_LAYOUT,
-
 )
 from product_parser import CardTextFields
 
@@ -820,7 +818,7 @@ def render_product_card(
     if DEBUG_LAYOUT:
         print_layout_debug(layout)
 
-        draw_text_layout(draw, layout)
+    draw_text_layout(draw, layout)
 
     card.save(output_path, "PNG", dpi=(DPI, DPI))
     return layout
