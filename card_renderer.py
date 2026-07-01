@@ -39,6 +39,7 @@ from config import (
     TILE_NAME_LINE_HEIGHT_MULTIPLIER,
     TILE_NAME_MAX_LINES,
     TILE_SIZE_MAX_LINES,
+    DEBUG_LAYOUT,
 )
 from product_parser import CardTextFields
 
@@ -69,6 +70,7 @@ FINISH_PREFIXES = {
 _FONT_INFO_PRINTED = False
 _FONT_PATH_CACHE: Path | None = None
 
+DEBUG_LAYOUT = False
 
 @dataclass(frozen=True)
 class TextLayout:
@@ -805,8 +807,10 @@ def render_product_card(
             f"Text layout does not fit: bottom {final_bottom}px > safe bottom {safe_bottom}px"
         )
 
-    print_layout_debug(layout)
-    draw_text_layout(draw, layout)
+    if DEBUG_LAYOUT:
+        print_layout_debug(layout)
+
+        draw_text_layout(draw, layout)
 
     card.save(output_path, "PNG", dpi=(DPI, DPI))
     return layout
