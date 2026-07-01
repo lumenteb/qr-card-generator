@@ -1,4 +1,3 @@
-
 # QR Card Generator
 
 Python automation tool for generating QR/product design cards from input data, QR codes, fonts, and visual assets.
@@ -14,7 +13,8 @@ Below is an example of a generated QR/product card:
 
 ## Overview
 
-This project automates a repetitive design workflow: creating many product/QR cards manually.  
+This project automates a repetitive design workflow: creating many product/QR cards manually.
+
 Instead of placing text, QR codes, and design elements one by one, the script generates ready-to-use cards automatically.
 
 The project was built as a real work automation tool, not as a tutorial exercise.
@@ -34,7 +34,8 @@ The script automates the card generation pipeline:
 - renders design cards;
 - places text and visual elements on a card layout;
 - exports generated cards;
-- prepares PDF output files.
+- prepares PDF output files;
+- writes a processing log for easier debugging and result checking.
 
 ## Result
 
@@ -48,6 +49,17 @@ The tool reduces repetitive manual design work from hours to minutes.
 - ReportLab / PDF export tools
 - File system automation
 - Image processing
+
+## Main Features
+
+- Batch generation of QR/product cards
+- Automatic QR code processing
+- Product data parsing
+- Card rendering with custom layout
+- PDF export
+- CSV processing log
+- Fallback handling when QR/product parsing fails
+- Separated modules for rendering, parsing, QR reading, PDF export, and configuration
 
 ## Project Structure
 
@@ -63,7 +75,7 @@ qr-card-generator/
 ├── input/
 ├── output/
 ├── fonts/
-└── examples/git init
+└── examples/
 
 
 [def]: examples/example_output.png
