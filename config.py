@@ -2,6 +2,9 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
+# Physical card dimensions used for print-ready output.
+# Values are defined in millimeters and converted to pixels using DPI.
+
 DPI = 300
 
 CARD_WIDTH_MM = 42
@@ -24,6 +27,9 @@ CARD_HEIGHT = mm_to_px(CARD_HEIGHT_MM)
 QR_SIZE = mm_to_px(QR_SIZE_MM)
 FONT_SIZE = pt_to_px(FONT_SIZE_PT)
 
+# QR placement settings.
+# QR_TOP_MARGIN is calculated from the original layout and manual upward adjustment.
+
 QR_TOP_MARGIN_ORIGINAL_MM = 4.8
 QR_MOVE_UP_MM = 2.0
 QR_TOP_MARGIN = max(0, mm_to_px(QR_TOP_MARGIN_ORIGINAL_MM - QR_MOVE_UP_MM))
@@ -31,6 +37,9 @@ QR_MOVE_UP_PX = mm_to_px(QR_MOVE_UP_MM)
 QR_ACTUAL_MOVE_UP_PX = mm_to_px(QR_TOP_MARGIN_ORIGINAL_MM) - QR_TOP_MARGIN
 QR_TO_TEXT_GAP = mm_to_px(1.7)
 BOTTOM_SAFE_MARGIN = mm_to_px(1.0)
+
+# QR placement settings.
+# QR_TOP_MARGIN is calculated from the original layout and manual upward adjustment.
 
 TEXT_SIDE_MARGIN_MM = 1.7
 TEXT_FIELD_GAP_MM = 1.6
@@ -59,6 +68,10 @@ MIN_TEXT_TRACKING_PT = -0.5
 BACKGROUND_COLOR = (255, 255, 255)
 TEXT_COLOR = (0, 0, 0)
 
+# Text layout settings.
+# These values control margins, spacing between text blocks, inner line gaps,
+# maximum number of lines, and compact text behavior.
+
 FONTS_DIR = BASE_DIR / "fonts"
 PREFERRED_FONT_KEYWORDS = ["Cormorant", "CormorantGaramond"]
 PRIMARY_FONT_PATH = FONTS_DIR / "CormorantGaramond-Regular.ttf"
@@ -71,6 +84,9 @@ FONT_CANDIDATES = (
     Path("C:/Windows/Fonts/georgia.ttf"),
     Path("C:/Windows/Fonts/arial.ttf"),
 )
+
+# Website request settings used by product parsing logic.
+# Delays and retries reduce the chance of failed requests or rate limiting.
 
 REQUEST_DELAY_SECONDS = 1.5
 REQUEST_JITTER_SECONDS = 0.7
