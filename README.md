@@ -1,6 +1,7 @@
 # QR Card Generator
 
 Python automation tool for generating QR/product design cards from input data, QR codes, fonts, and visual assets.
+This tool automates repetitive QR/product card generation and reduces manual design work from hours to minutes.
 
 ## Example Output
 
