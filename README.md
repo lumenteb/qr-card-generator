@@ -76,3 +76,10 @@ qr-card-generator/
 ├── output/
 ├── fonts/
 └── examples/
+
+How to Run?
+
+git clone ...
+cd qr-card-generator
+pip install -r requirements.txt
+python main.py
